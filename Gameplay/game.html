@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Type Rider</title>
+   <script defer src="/_vercel/insights/script.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap">
+</head>
+
+<body class="bg-[#323437] text-[#e2b714] font-mono">
+  <nav class="fixed top-0 left-0 w-full bg-[#2c2e31] text-[#e2b714] py-3 px-6 flex items-center justify-between shadow-sm z-50">
+    <h1 class="text-lg font-semibold tracking-wide select-none">TypeRider</h1>
+    <div class="flex items-center gap-6">
+        <a href="Contributors.html" class="flex items-center gap-1 hover:text-[#f7d763] transition-colors">
+            <span class="text-sm"> <i class="fas fa-code text-medium font-white"></i> </span>
+        </a>
+
+      <a href="/auth/signup" class="flex items-center gap-1 hover:text-[#f7d763] transition-colors">
+        <div class="flex items-center gap-3">
+            <img src="https://avatars.githubusercontent.com/u/197632737?s=400&u=72eb988905ba8abe14e57dcefeb8d1272b7f58a0&v=4" alt="pfp" class="w-8 h-8 rounded-full border border-[#3a3c3f]" />
+            <span class="text-sm text-[#d1d0c5]">Typist</span>
+        </div>
+      </a>
+    </div>
+</nav>
+  
+  <main class="flex flex-col items-center justify-center min-h-screen gap-8 px-6">
+    <!-- Top Bar -->
+    <div class="w-full max-w-4xl flex items-center justify-between text-sm">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <span class="text-[#646669]">time</span>
+          <span id="timer" class="text-[#e2b714]">30</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[#646669]">wpm</span>
+          <span id="wpm-display" class="text-[#e2b714]">0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[#646669]">acc</span>
+          <span id="accuracy-display" class="text-[#e2b714]">100%</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <select id="difficulty" class="bg-[#2c2e31] text-[#646669] px-3 py-1 rounded border-none outline-none cursor-pointer hover:text-[#e2b714] transition">
+          <option value="15">15s</option>
+          <option value="30" selected>30s</option>
+          <option value="60">60s</option>
+          <option value="120">120s</option>
+        </select>
+        <button id="sound-toggle" class="text-[#646669] hover:text-[#e2b714] transition">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Text Display -->
+    <div class="w-full max-w-4xl">
+      <div id="mid" class="text-2xl leading-relaxed min-h-32 overflow-hidden select-none">
+        <div class="text-[#646669]">press <span class="text-[#e2b714]">ctrl</span> to start</div>
+      </div>
+    </div>
+
+    <!-- Virtual Keyboard -->
+    <div class="w-full max-w-4xl mt-4">
+      <div class="keyboard grid gap-1">
+        <div class="row flex justify-center gap-1">
+          <div class="key" data-key="`">`</div>
+          <div class="key" data-key="1">1</div>
+          <div class="key" data-key="2">2</div>
+          <div class="key" data-key="3">3</div>
+          <div class="key" data-key="4">4</div>
+          <div class="key" data-key="5">5</div>
+          <div class="key" data-key="6">6</div>
+          <div class="key" data-key="7">7</div>
+          <div class="key" data-key="8">8</div>
+          <div class="key" data-key="9">9</div>
+          <div class="key" data-key="0">0</div>
+          <div class="key" data-key="-">-</div>
+          <div class="key" data-key="=">=</div>
+          <div class="key key-lg" data-key="Backspace">bksp</div>
+        </div>
+
+        <div class="row flex justify-center gap-1">
+          <div class="key key-md" data-key="Tab">tab</div>
+          <div class="key" data-key="q">q</div>
+          <div class="key" data-key="w">w</div>
+          <div class="key" data-key="e">e</div>
+          <div class="key" data-key="r">r</div>
+          <div class="key" data-key="t">t</div>
+          <div class="key" data-key="y">y</div>
+          <div class="key" data-key="u">u</div>
+          <div class="key" data-key="i">i</div>
+          <div class="key" data-key="o">o</div>
+          <div class="key" data-key="p">p</div>
+          <div class="key" data-key="[">[</div>
+          <div class="key" data-key="]">]</div>
+          <div class="key key-md" data-key="\\">\</div>
+        </div>
+
+        <div class="row flex justify-center gap-1">
+          <div class="key key-lg" data-key="CapsLock">caps</div>
+          <div class="key" data-key="a">a</div>
+          <div class="key" data-key="s">s</div>
+          <div class="key" data-key="d">d</div>
+          <div class="key" data-key="f">f</div>
+          <div class="key" data-key="g">g</div>
+          <div class="key" data-key="h">h</div>
+          <div class="key" data-key="j">j</div>
+          <div class="key" data-key="k">k</div>
+          <div class="key" data-key="l">l</div>
+          <div class="key" data-key=";">;</div>
+          <div class="key" data-key="'">'</div>
+          <div class="key key-xl" data-key="Enter">enter</div>
+        </div>
+
+        <div class="row flex justify-center gap-1">
+          <div class="key key-xl" data-key="Shift">shift</div>
+          <div class="key" data-key="z">z</div>
+          <div class="key" data-key="x">x</div>
+          <div class="key" data-key="c">c</div>
+          <div class="key" data-key="v">v</div>
+          <div class="key" data-key="b">b</div>
+          <div class="key" data-key="n">n</div>
+          <div class="key" data-key="m">m</div>
+          <div class="key" data-key=",">,</div>
+          <div class="key" data-key=".">.</div>
+          <div class="key" data-key="/">/</div>
+          <div class="key key-xl" data-key="Shift">shift</div>
+        </div>
+
+        <div class="row flex justify-center gap-1">
+          <div class="key key-md" data-key="Control">ctrl</div>
+          <div class="key key-sm" data-key="Meta">win</div>
+          <div class="key key-sm" data-key="Alt">alt</div>
+          <div class="key key-space" data-key=" "></div>
+          <div class="key key-sm" data-key="Alt">alt</div>
+          <div class="key key-sm" data-key="Meta">win</div>
+          <div class="key key-md" data-key="Control">ctrl</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div id="message" class="hidden fixed inset-0 bg-[#323437]/95 flex items-center justify-center z-50">
+      <div class="bg-[#2c2e31] p-8 rounded-xl max-w-2xl w-full mx-4">
+        <div class="space-y-6">
+          <h2 id="message-text" class="text-3xl font-semibold text-[#e2b714] text-center"></h2>
+          
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div class="text-3xl font-bold text-[#e2b714]" id="final-wpm">0</div>
+              <div class="text-sm text-[#646669]">wpm</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-[#e2b714]" id="final-accuracy">0%</div>
+              <div class="text-sm text-[#646669]">accuracy</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-[#e2b714]" id="final-chars">0</div>
+              <div class="text-sm text-[#646669]">characters</div>
+            </div>
+          </div>
+
+          <div class="h-64">
+            <canvas id="wpmChart"></canvas>
+          </div>
+
+          <button onclick="closeMessage()" class="w-full px-6 py-3 rounded-lg bg-[#e2b714] text-[#323437] font-semibold hover:bg-[#f0c347] transition">
+            next
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let gameStarted = false;
+    let timeLeft = 30;
+    let timerInterval;
+    let originalText = "";
+    let typedText = "";
+    let keyPressCount = 0;
+    let correctKeys = 0;
+    let startTime = 0;
+    let soundEnabled = true;
+    let capsActive = false;
+    let wpmHistory = [];
+    let timeHistory = [];
+    let wpmChart = null;
+
+    const keyMap = new Map();
+
+    function initKeyboardMapping() {
+      document.querySelectorAll('.key').forEach(key => {
+        const keyValue = key.getAttribute('data-key');
+        if (keyValue) {
+          const normalizedKey = normalizeKey(keyValue);
+          if (!keyMap.has(normalizedKey)) {
+            keyMap.set(normalizedKey, []);
+          }
+          keyMap.get(normalizedKey).push(key);
+        }
+      });
+    }
+
+    function normalizeKey(key) {
+      const mapping = {
+        ' ': 'space',
+        'Control': 'control',
+        'Shift': 'shift',
+        'Alt': 'alt',
+        'Meta': 'meta',
+        'Enter': 'enter',
+        'Backspace': 'backspace',
+        'Tab': 'tab',
+        'CapsLock': 'capslock',
+        'ContextMenu': 'contextmenu'
+      };
+      return mapping[key] || key.toLowerCase();
+    }
+
+    function highlightKey(key, isCorrect = null) {
+      const normalizedKey = normalizeKey(key);
+      const elements = keyMap.get(normalizedKey);
+      
+      if (elements) {
+        elements.forEach(el => {
+          el.classList.add('active');
+          if (isCorrect === true) {
+            el.classList.add('correct');
+          } else if (isCorrect === false) {
+            el.classList.add('incorrect');
+          }
+          
+          setTimeout(() => {
+            el.classList.remove('active', 'correct', 'incorrect');
+          }, 100);
+        });
+      }
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      if (type === 'correct') {
+        oscillator.frequency.value = 800;
+        gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+      } else if (type === 'incorrect') {
+        oscillator.frequency.value = 200;
+        gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      }
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      startTime = Date.now();
+      wpmHistory = [];
+      timeHistory = [];
+      const timerEl = document.getElementById("timer");
+      timerEl.textContent = timeLeft;
+      
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = timeLeft;
+        
+        const elapsed = (Date.now() - startTime) / 1000 / 60;
+        const currentWpm = elapsed > 0 ? Math.round((typedText.length / 5) / elapsed) : 0;
+        wpmHistory.push(currentWpm);
+        timeHistory.push(Math.round(elapsed * 60));
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          evaluatePerformance();
+        }
+      }, 1000);
+    }
+
+    async function fetchParagraph() {
+      const difficulty = parseInt(document.getElementById('difficulty').value);
+      timeLeft = difficulty;
+      
+      try {
+        const res = await fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary");
+        const data = await res.json();
+        originalText = data.extract.replace(/\s+/g, ' ').trim().substring(0, 300);
+      } catch (error) {
+        originalText = "the quick brown fox jumps over the lazy dog this is a fallback text for typing practice when the api is unavailable keep practicing to improve your typing speed and accuracy with consistent effort you will see improvement";
+      }
+      
+      typedText = "";
+      gameStarted = true;
+      keyPressCount = 0;
+      correctKeys = 0;
+      
+      document.getElementById("message").classList.add("hidden");
+      startTimer();
+      updateDisplay();
+      updateStats();
+    }
+
+    function updateDisplay() {
+      let display = "";
+      
+      for (let i = 0; i < originalText.length; i++) {
+        const char = originalText[i];
+        
+        if (i < typedText.length) {
+          const isCorrect = typedText[i] === char;
+          display += `<span class="typed-char ${isCorrect ? 'correct-char' : 'incorrect-char'}">${char}</span>`;
+        } else {
+          display += `<span class="untyped-char">${char}</span>`;
+        }
+      }
+      
+      document.getElementById("mid").innerHTML = display;
+      updateStats();
+    }
+
+    function updateStats() {
+      const elapsed = (Date.now() - startTime) / 1000 / 60;
+      const wpm = elapsed > 0 ? Math.round((typedText.length / 5) / elapsed) : 0;
+      
+      let correct = 0;
+      for (let i = 0; i < typedText.length && i < originalText.length; i++) {
+        if (typedText[i] === originalText[i]) correct++;
+      }
+      const accuracy = typedText.length > 0 ? Math.round((correct / typedText.length) * 100) : 100;
+      
+      document.getElementById("wpm-display").textContent = wpm;
+      document.getElementById("accuracy-display").textContent = accuracy + "%";
+    }
+
+    function createWpmChart(wpmData, timeData) {
+      const ctx = document.getElementById('wpmChart');
+      
+      if (wpmChart) {
+        wpmChart.destroy();
+      }
+      
+      wpmChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timeData,
+          datasets: [{
+            label: 'WPM',
+            data: wpmData,
+            borderColor: '#e2b714',
+            backgroundColor: 'rgba(226, 183, 20, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: '#e2b714',
+            pointBorderColor: '#e2b714'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#2c2e31',
+              titleColor: '#e2b714',
+              bodyColor: '#d1d0c5',
+              borderColor: '#646669',
+              borderWidth: 1,
+              padding: 10,
+              displayColors: false,
+              callbacks: {
+                title: (context) => `${context[0].label}s`,
+                label: (context) => `${context.parsed.y} wpm`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: '#3a3c3f',
+                drawBorder: false
+              },
+              ticks: {
+                color: '#646669',
+                font: {
+                  family: 'Roboto Mono',
+                  size: 11
+                }
+              },
+              title: {
+                display: true,
+                text: 'time (seconds)',
+                color: '#646669',
+                font: {
+                  family: 'Roboto Mono',
+                  size: 12
+                }
+              }
+            },
+            y: {
+              grid: {
+                color: '#3a3c3f',
+                drawBorder: false
+              },
+              ticks: {
+                color: '#646669',
+                font: {
+                  family: 'Roboto Mono',
+                  size: 11
+                }
+              },
+              title: {
+                display: true,
+                text: 'words per minute',
+                color: '#646669',
+                font: {
+                  family: 'Roboto Mono',
+                  size: 12
+                }
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    function evaluatePerformance() {
+      clearInterval(timerInterval);
+      
+      let correct = 0;
+      const minLength = Math.min(typedText.length, originalText.length);
+      for (let i = 0; i < minLength; i++) {
+        if (typedText[i] === originalText[i]) correct++;
+      }
+      
+      const accuracy = minLength > 0 ? Math.round((correct / minLength) * 100) : 0;
+      const totalTime = parseInt(document.getElementById('difficulty').value);
+      const wpm = Math.round((typedText.length / 5) / (totalTime / 60));
+      
+      let msg = "";
+      if (accuracy === 100) {
+        msg = "perfect!";
+      } else if (accuracy >= 95) {
+        msg = "excellent!";
+      } else if (accuracy >= 85) {
+        msg = "great!";
+      } else if (accuracy >= 70) {
+        msg = "good!";
+      } else {
+        msg = "keep practicing!";
+      }
+      
+      document.getElementById("message-text").textContent = msg;
+      document.getElementById("final-wpm").textContent = wpm;
+      document.getElementById("final-accuracy").textContent = accuracy + "%";
+      document.getElementById("final-chars").textContent = `${typedText.length}/${originalText.length}`;
+      
+      createWpmChart(wpmHistory, timeHistory);
+      
+      document.getElementById("message").classList.remove("hidden");
+    }
+
+    function closeMessage() {
+      document.getElementById("message").classList.add("hidden");
+      document.getElementById("mid").innerHTML = `<div class="text-[#646669]">press <span class="text-[#e2b714]">ctrl</span> to start</div>`;
+      gameStarted = false;
+      updateStats();
+    }
+
+    document.addEventListener("keydown", e => {
+      highlightKey(e.key);
+      
+      if (!gameStarted && e.ctrlKey) {
+        fetchParagraph();
+        return;
+      }
+      
+      if (!gameStarted || timeLeft <= 0) return;
+      
+      if (e.key === "CapsLock") {
+        capsActive = !capsActive;
+        const capsKeys = keyMap.get('capslock');
+        if (capsKeys) {
+          capsKeys.forEach(key => {
+            key.classList.toggle('caps-active', capsActive);
+          });
+        }
+        return;
+      }
+      
+      if (e.key === "Backspace") {
+        e.preventDefault();
+        if (typedText.length > 0) {
+          typedText = typedText.slice(0, -1);
+          updateDisplay();
+        }
+        return;
+      }
+      
+      if (e.key === "Tab") {
+        e.preventDefault();
+        return;
+      }
+      
+      if (e.key.length === 1) {
+        e.preventDefault();
+        const expectedChar = originalText[typedText.length];
+        const isCorrect = e.key === expectedChar;
+        
+        typedText += e.key;
+        keyPressCount++;
+        
+        if (isCorrect) {
+          correctKeys++;
+          highlightKey(e.key, true);
+          playSound('correct');
+        } else {
+          highlightKey(e.key, false);
+          playSound('incorrect');
+        }
+        
+        updateDisplay();
+        
+        if (typedText.length >= originalText.length) {
+          evaluatePerformance();
+        }
+      }
+    });
+
+    document.getElementById('sound-toggle').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('sound-toggle');
+      btn.style.opacity = soundEnabled ? '1' : '0.3';
+    });
+
+    document.getElementById('difficulty').addEventListener('change', () => {
+      if (!gameStarted) {
+        timeLeft = parseInt(document.getElementById('difficulty').value);
+        document.getElementById('timer').textContent = timeLeft;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initKeyboardMapping();
+    });
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto Mono', monospace;
+    }
+
+    .key {
+      background: #2c2e31;
+      color: #646669;
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      min-width: 38px;
+      height: 38px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.05s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      text-transform: lowercase;
+    }
+
+    .key:hover {
+      background: #3a3c3f;
+      color: #d1d0c5;
+    }
+
+    .key.active {
+      background: #e2b714;
+      color: #323437;
+      transform: scale(0.95);
+    }
+
+    .key.correct {
+      background: #e2b714;
+      color: #323437;
+    }
+
+    .key.incorrect {
+      background: #ca4754;
+      color: #323437;
+    }
+
+    .key.caps-active {
+      background: #e2b714;
+      color: #323437;
+    }
+
+    .key-sm {
+      min-width: 45px;
+    }
+
+    .key-md {
+      min-width: 52px;
+    }
+
+    .key-lg {
+      min-width: 60px;
+    }
+
+    .key-xl {
+      min-width: 75px;
+    }
+
+    .key-space {
+      min-width: 230px;
+    }
+
+    .typed-char {
+      transition: color 0.05s ease;
+    }
+
+    .correct-char {
+      color: #d1d0c5;
+    }
+
+    .incorrect-char {
+      color: #ca4754;
+    }
+
+    .untyped-char {
+      color: #646669;
+    }
+
+    #mid::-webkit-scrollbar {
+      display: none;
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23646669' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      padding-right: 2rem;
+    }
+
+    select:hover {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23e2b714' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    }
+  </style>
+</body>
+</html>
