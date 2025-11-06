@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buff Shop — Monkeytype Theme</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+  <style>
+    :root{
+      --bg: #1b1b1b;
+      --card: #242424;
+      --muted: #999;
+      --accent: #f9d342;
+      --purple: #a78bfa;   /* legendary */
+      --red: #ef4444;      /* rare */
+      --blue: #60a5fa;     /* common */
+      --green: #34d399;    /* uncommon */
+    }
+    html,body{height:100%}
+    body{
+      background: var(--bg);
+      color: #e5e5e5;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+    }
+
+    .container{
+      width:100%;
+      max-width:1100px;
+      margin:auto;
+    }
+
+    .shop-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:1.25rem;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    header.shop-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:1rem;
+      margin-bottom:1rem;
+    }
+
+    .coins{
+      display:flex;
+      align-items:center;
+      gap:0.5rem;
+      font-weight:600;
+      color:var(--accent);
+    }
+
+    .refresh-btn{
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.04);
+      padding:0.5rem 0.75rem;
+      border-radius:10px;
+      display:inline-flex;
+      gap:0.5rem;
+      align-items:center;
+      cursor:pointer;
+      transition:transform .15s ease, background .15s ease;
+    }
+    .refresh-btn:hover{ transform:translateY(-3px); background: rgba(255,255,255,0.02) }
+
+    .grid-cards{
+      display:grid;
+      grid-template-columns: repeat(3,1fr);
+      gap:1rem;
+    }
+
+    @media (max-width:900px){
+      .grid-cards{ grid-template-columns: repeat(2,1fr) }
+    }
+    @media (max-width:640px){
+      .grid-cards{ grid-template-columns: 1fr; }
+    }
+
+    .buff-card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+      border-radius:12px;
+      padding:1rem;
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;
+      flex-direction:column;
+      gap:0.75rem;
+      min-height:170px;
+      transition: transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .18s;
+    }
+    .buff-card:hover{ transform: translateY(-6px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+
+    .buff-top{
+      display:flex;
+      gap:0.75rem;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .buff-left{ display:flex; gap:0.75rem; align-items:center; }
+    .buff-icon{
+      width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      border:1px solid rgba(255,255,255,0.02);
+    }
+    .buff-name{ font-weight:700; font-size:1rem; }
+    .rarity-pill{
+      font-weight:700;
+      padding:0.25rem 0.6rem;
+      border-radius:999px;
+      font-size:0.78rem;
+    }
+
+    .buff-desc{ color:var(--muted); font-size:0.95rem; flex:1; }
+    .buff-foot{ display:flex;gap:0.5rem;align-items:center;justify-content:space-between; margin-top:0.25rem; }
+
+    .buy-btn{
+      background:var(--accent);
+      color:#0b0b0b;
+      padding:0.5rem 0.75rem;
+      border-radius:10px;
+      font-weight:700;
+      cursor:pointer;
+      border:none;
+      transition:transform .12s;
+    }
+    .buy-btn:active{ transform:translateY(1px) }
+    .buy-btn[disabled]{ opacity:0.5; cursor:not-allowed; transform:none; }
+
+    .price-pill{
+      background: rgba(255,255,255,0.03);
+      padding:0.25rem 0.5rem;
+      border-radius:8px;
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      gap:0.4rem;
+      color:var(--muted);
+    }
+
+    .owned-badge{
+      background: rgba(0,0,0,0.4);
+      padding:0.25rem 0.6rem;
+      border-radius:999px;
+      font-weight:700;
+      color:var(--muted);
+    }
+
+    /* rarity colors */
+    .rar-legendary{ background: linear-gradient(90deg,var(--purple), #7c3aed); color: #0b0b0b; }
+    .rar-rare     { background: linear-gradient(90deg,var(--red), #ef4444); color: #fff; }
+    .rar-common   { background: linear-gradient(90deg,var(--blue), #3b82f6); color: #fff; }
+    .rar-uncommon { background: linear-gradient(90deg,var(--green), #10b981); color: #fff; }
+
+    /* small flourish */
+    .note{ color:var(--muted); font-size:0.9rem; margin-top:0.75rem; text-align:right; }
+    .fade-in{ animation: fadeIn .32s ease both; }
+    @keyframes fadeIn{ from{opacity:0; transform: translateY(6px)} to{opacity:1; transform:none} }
+	
+	/* Legendary glow + hover aura */
+.buff-card.legendary-glow {
+  position: relative;
+  box-shadow: 0 0 16px 4px rgba(167,139,250,0.3),
+              0 0 60px rgba(167,139,250,0.12);
+  border: 1px solid rgba(167,139,250,0.4);
+}
+
+.buff-card.legendary-glow:hover {
+  box-shadow: 0 0 24px 8px rgba(167,139,250,0.45),
+              0 0 80px rgba(167,139,250,0.2);
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.25s ease;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="shop-card">
+      <header class="shop-head">
+        <div style="display:flex;flex-direction:column;">
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <div style="font-weight:800;font-size:1.1rem">Buff Shop</div>
+            <div style="color:var(--muted);font-size:0.95rem;">Temporary buffs — effects to be added later</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+          <div class="coins"><i class="fas fa-coins"></i><span id="coins">300</span></div>
+          <button id="refreshBtn" class="refresh-btn" title="Refresh offers (free)">
+            <i class="fas fa-sync-alt"></i>
+            <span class="hidden sm:inline-block"> Refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="grid-cards" id="cardsContainer" aria-live="polite"></div>
+
+      <div class="note">Legendary <span style="color:var(--purple);font-weight:800">purple</span> • Rare <span style="color:var(--red);font-weight:800">red</span> • Uncommon <span style="color:var(--green);font-weight:800">green</span> • Common <span style="color:var(--blue);font-weight:800">blue</span></div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Buff data (from your list) ----
+    const buffs = [
+      { name: "Made in Heaven", rarity: "legendary", price: 300, description: "Accelerates the timer backwards, it can go into negative seconds", reference: "I'm going to obtain the way to Heaven!", icon: "fa-solid fa-gem" },
+      { name: "Makoto", rarity: "legendary", price: 300, description: "Regenerates health per word correct", reference: "Mass destruction", icon: "fa-solid fa-heart" },
+      { name: "Just Vibe", rarity: "legendary", price: 300, description: "Just Vibe", reference: "Levan Pollka", icon: "fa-solid fa-music" },
+
+      { name: "Sam Howell", rarity: "rare", price: 250, description: "1 in 200 chance of auto-typing the paragraph", reference: "Secure, Contain, Protect", icon: "fa-solid fa-shield" },
+      { name: "Jack the Ripper", rarity: "rare", price: 250, description: "Every 6 words typed, -6 health but +6 timer", reference: "Whitechapel", icon: "fa-solid fa-bolt" },
+      { name: "Adam", rarity: "rare", price: 250, description: "Per 6 words typed, increase your health by +5", reference: "The Beginning", icon: "fa-solid fa-plus" },
+      { name: "Plague", rarity: "rare", price: 250, description: "Lose 10 health for every 5 words typed, however increase the timer by 10s", reference: "Plague.INC", icon: "fa-solid fa-virus" },
+      { name: "AC130", rarity: "rare", price: 250, description: "Destroy 10 words from any given paragraph", reference: "Enemy AC130 above!", icon: "fa-solid fa-fighter-jet" },
+      { name: "Excalibur", rarity: "rare", price: 250, description: "Gives +50 health permanently", reference: "Excalibaaaaaaaaaaaaaaaaa!!!", icon: "fa-solid fa-knife" },
+	  { name: "El Drago", rarity: "rare", price: 250, description: "If every 10 letters are correct in a row, +5 letters autofill, missing will refresh this counter.", reference: "Ryuga!", icon: "fa-solid fa-dragon" },
+
+      { name: "Eve", rarity: "common", price: 100, description: "Increase permanent timer by +5s", reference: "The Beginning", icon: "fa-solid fa-clock" },
+      { name: "Lion", rarity: "common", price: 100, description: "Increase health by +10", reference: "King of the jungle", icon: "fa-solid fa-paw" },
+      { name: "Jason Vorhees", rarity: "common", price: 100, description: "Increase damage reduction", reference: "It's Friday the 13th", icon: "fa-solid fa-mask" },
+      { name: "Pinocchio", rarity: "common", price: 100, description: "Per word wrong, decrease health by increased amount, but more chance to dodge attacks", reference: "NO LIES", icon: "fa-solid fa-theater-masks" },
+      { name: "Percy Jackson", rarity: "common", price: 100, description: "Increase the amount of coins received by 20 at the end of the round", reference: "Half-Human, Half-God", icon: "fa-solid fa-water" },
+      { name: "Just a Poor Boy", rarity: "common", price: 100, description: "Decrease the amount of coins received by 10% but Health permanently increased by 20%", reference: "I'm just a poor boy, I need no sympathy", icon: "fa-solid fa-music" },
+      { name: "Pablo", rarity: "common", price: 100, description: "Increase the timer by +10 seconds when health is below 50%", reference: "Is it a plane? No, Its Pablo", icon: "fa-solid fa-plane" },
+      { name: "Song Gi-hun", rarity: "common", price: 100, description: "After 3 rounds receive +100 coins", reference: "I've played these games before!!!!", icon: "fa-solid fa-gamepad" },
+      { name: "Jimbo", rarity: "common", price: 100, description: "+4 health and +4s timer permanently", reference: "Multiple of chips", icon: "fa-solid fa-plus-circle" },
+      { name: "Bing-Chilling", rarity: "common", price: 100, description: "Freeze the timer at the start of the round for 5s", reference: "Bing-Chilling", icon: "fa-solid fa-snowflake" },
+	  { name: "Freddy", rarity: "common", price: 100, description: "At the start of the round -10 health, but +15s	.", reference: "Arr-Arr-Ar-Arr", icon: "fa-solid fa-otter" }
+	  
+    ];
+
+    // ---- initial coins (temporary) ----
+    let coins = 300;
+    const coinsEl = document.getElementById('coins');
+
+    // ---- rarity config & colors ----
+    const rarityConfig = {
+      legendary: { weight: 0.01, class: 'rar-legendary', colorVar: '--purple' },
+      rare:      { weight: 0.19, class: 'rar-rare', colorVar: '--red' },
+      uncommon:  { weight: 0.40, class: 'rar-uncommon', colorVar: '--green' },
+      common:    { weight: 0.40, class: 'rar-common', colorVar: '--blue' }
+    };
+
+    // index buffs by rarity for quick access
+    const buffsByRarity = buffs.reduce((acc, b) => {
+      acc[b.rarity] = acc[b.rarity] || [];
+      acc[b.rarity].push(b);
+      return acc;
+    }, {});
+
+    // helper — get available rarities & normalized weights (exclude empty rarities)
+    function getAvailableRarityWeights() {
+      const available = {};
+      let total = 0;
+      for (const r in rarityConfig) {
+        if ((buffsByRarity[r] || []).length > 0) {
+          available[r] = rarityConfig[r].weight;
+          total += rarityConfig[r].weight;
+        }
+      }
+      // normalize to sum to 1
+      for (const r in available) available[r] = available[r] / total;
+      return available;
+    }
+
+    // sample a rarity according to weights
+    function sampleRarity() {
+      const weights = getAvailableRarityWeights();
+      const rnd = Math.random();
+      let acc = 0;
+      for (const r of Object.keys(weights)) {
+        acc += weights[r];
+        if (rnd <= acc) return r;
+      }
+      // fallback
+      return Object.keys(weights)[0];
+    }
+
+    // pick one buff randomly according to rarity sampling
+    function pickRandomBuff() {
+      let tries = 0;
+      while (tries < 6) {
+        tries++;
+        const rarity = sampleRarity();
+        const pool = buffsByRarity[rarity] || [];
+        if (pool.length === 0) continue;
+        const idx = Math.floor(Math.random() * pool.length);
+        return pool[idx];
+      }
+      // absolute fallback: any buff
+      return buffs[Math.floor(Math.random()*buffs.length)];
+    }
+
+    // generate N unique offers (try to avoid duplicates)
+    function generateOffers(n = 3) {
+      const offers = [];
+      const used = new Set();
+      let attempts = 0;
+      while (offers.length < n && attempts < 30) {
+        attempts++;
+        const candidate = pickRandomBuff();
+        const key = candidate.name + '|' + candidate.rarity;
+        if (used.has(key)) continue;
+        used.add(key);
+        offers.push(candidate);
+      }
+      return offers;
+    }
+
+    // render cards
+    const cardsContainer = document.getElementById('cardsContainer');
+
+    function renderOffers(offers) {
+      coinsEl.textContent = coins;
+      cardsContainer.innerHTML = '';
+      offers.forEach((b, i) => {
+        const card = document.createElement('div');
+        card.className = 'buff-card fade-in';
+		if (b.rarity === 'legendary') card.classList.add('legendary-glow');
+
+        const top = document.createElement('div');
+        top.className = 'buff-top';
+
+        const left = document.createElement('div');
+        left.className = 'buff-left';
+
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'buff-icon';
+        iconWrap.innerHTML = `<i class="${b.icon}"></i>`;
+
+        const nameWrap = document.createElement('div');
+        nameWrap.innerHTML = `<div class="buff-name">${b.name}</div><div style="font-size:0.86rem;color:var(--muted)">${b.reference || ''}</div>`;
+
+        left.appendChild(iconWrap);
+        left.appendChild(nameWrap);
+
+        const raritySpan = document.createElement('div');
+        raritySpan.className = 'rarity-pill ' + (rarityConfig[b.rarity]?.class || '');
+        raritySpan.textContent = b.rarity.toUpperCase();
+
+        top.appendChild(left);
+        top.appendChild(raritySpan);
+
+        const desc = document.createElement('div');
+        desc.className = 'buff-desc';
+        desc.textContent = b.description;
+
+        const foot = document.createElement('div');
+        foot.className = 'buff-foot';
+
+        const price = document.createElement('div');
+        price.className = 'price-pill';
+        price.innerHTML = `<i class="fas fa-coins"></i> ${b.price}`;
+
+        const buyBtn = document.createElement('button');
+        buyBtn.className = 'buy-btn';
+        buyBtn.textContent = 'Buy';
+        buyBtn.title = 'Buy this buff';
+
+        // check if already owned
+        const ownedKey = 'owned::' + b.name;
+        if (localStorage.getItem(ownedKey) === '1') {
+          buyBtn.disabled = true;
+          buyBtn.textContent = 'Owned';
+          price.style.opacity = '0.6';
+        }
+
+        buyBtn.addEventListener('click', () => {
+          if (localStorage.getItem(ownedKey) === '1') return;
+          if (coins < b.price) {
+            // simple feedback
+            buyBtn.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-6px)' }, { transform: 'translateY(0)' }], { duration: 240 });
+            return;
+          }
+          coins -= b.price;
+          localStorage.setItem(ownedKey, '1');
+          coinsEl.textContent = coins;
+          buyBtn.disabled = true;
+          buyBtn.textContent = 'Owned';
+          // NOTE: we intentionally don't apply the buff effect here — you'll add logic later.
+        });
+
+        foot.appendChild(price);
+        foot.appendChild(buyBtn);
+
+        card.appendChild(top);
+        card.appendChild(desc);
+        card.appendChild(foot);
+
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    // initial load
+    function initShop() {
+      const offers = generateOffers(3);
+      renderOffers(offers);
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      // small pulse animation
+      const btn = document.getElementById('refreshBtn');
+      btn.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(8deg)' }, { transform: 'rotate(0deg)' }], { duration: 280 });
+      const newOffers = generateOffers(3);
+      renderOffers(newOffers);
+    });
+
+    // show initial coins from storage if saved (optional)
+    const savedCoins = localStorage.getItem('playerCoins');
+    if (savedCoins !== null) coins = parseInt(savedCoins, 10) || coins;
+    // save coins on unload so value persists in same browser
+    window.addEventListener('beforeunload', () => {
+      localStorage.setItem('playerCoins', coins);
+    });
+
+    // initialize
+    initShop();
+  </script>
+</body>
+</html>
