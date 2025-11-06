@@ -112,27 +112,48 @@
     }
 
     async function fetchParagraph() {
-      const difficulty = parseInt(document.getElementById('difficulty').value);
-      timeLeft = difficulty;
-      
-      try {
-        const res = await fetch("https://en.wikipedia.org/api/rest_v1/page/random/summary");
-        const data = await res.json();
-        originalText = data.extract.replace(/\s+/g, ' ').trim().substring(0, 300);
-      } catch (error) {
-        originalText = "the quick brown fox jumps over the lazy dog this is a fallback text for typing practice when the api is unavailable keep practicing to improve your typing speed and accuracy with consistent effort you will see improvement";
+  const difficulty = parseInt(document.getElementById('difficulty').value);
+  timeLeft = difficulty;
+
+  const selectedFile = localStorage.getItem('selectedRound'); // e.g. "technology.json"
+
+  try {
+    if (selectedFile) {
+      const filePath = `../Round/${selectedFile}`;
+      console.log("Fetching from:", filePath);
+
+      const res = await fetch(filePath);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const jsonData = await res.json();
+
+      if (jsonData.paragraphs && jsonData.paragraphs.length > 0) {
+        const randomIndex = Math.floor(Math.random() * jsonData.paragraphs.length);
+        originalText = jsonData.paragraphs[randomIndex]
+          .replace(/\s+/g, ' ')
+          .trim()
+          .substring(0, 300);
+      } else {
+        throw new Error("No paragraphs found in JSON");
       }
-      
-      typedText = "";
-      gameStarted = true;
-      keyPressCount = 0;
-      correctKeys = 0;
-      
-      document.getElementById("message").classList.add("hidden");
-      startTimer();
-      updateDisplay();
-      updateStats();
+    } else {
+      throw new Error("No round selected");
     }
+
+  } catch (error) {
+    console.error("Error fetching paragraph:", error);
+    originalText = "the quick brown fox jumps over the lazy dog this is a fallback text for typing practice when the json is unavailable keep practicing to improve your typing speed and accuracy with consistent effort you will see improvement";
+  }
+
+  typedText = "";
+  gameStarted = true;
+  keyPressCount = 0;
+  correctKeys = 0;
+
+  document.getElementById("message").classList.add("hidden");
+  startTimer();
+  updateDisplay();
+  updateStats();
+}
 
     function updateDisplay() {
       let display = "";
