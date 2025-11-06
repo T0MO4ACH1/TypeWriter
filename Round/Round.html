@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Round Select — Monkeytype Theme</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1b1b1b;
+      --text: #e5e5e5;
+      --accent: #f9d342;
+      --card: #242424;
+      --muted: #999;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      padding: 3rem;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+    .option {
+      border: 2px solid transparent;
+      background: var(--card);
+      color: var(--text);
+      border-radius: 9999px;
+      padding: 1rem 2rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .option:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .option.selected {
+      background: var(--accent);
+      color: #000;
+      transform: scale(1.05);
+    }
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+    .loading-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .loader {
+      border: 4px solid rgba(255,255,255,0.1);
+      border-top: 4px solid var(--accent);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="card max-w-md w-full">
+    <h1 class="text-2xl font-extrabold mb-8">Select a Round</h1>
+    <div class="flex flex-col gap-4">
+      <button class="option" data-file="technology.json">Technology</button>
+      <button class="option" data-file="science.json">Science</button>
+      <button class="option" data-file="history.json">History</button>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loading">
+    <div class="loader"></div>
+  </div>
+
+  <script>
+    const options = document.querySelectorAll('.option');
+    const loading = document.getElementById('loading');
+
+    options.forEach(option => {
+      option.addEventListener('click', () => {
+        options.forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+
+        const file = option.getAttribute('data-file');
+        localStorage.setItem('selectedRound', file);
+
+        // show loading overlay before navigating
+        loading.classList.add('active');
+
+        setTimeout(() => {
+          window.location.href = '../Gameplay/game.html';
+        }, 2000); // simulate loading delay
+      });
+    });
+  </script>
+</body>
+</html>
