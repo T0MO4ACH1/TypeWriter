@@ -1,0 +1,77 @@
+:root {
+    /* Serika Dark inspired palette */
+    --bg: #2c2e31;
+    /* very dark */
+    --card: #0f1720;
+    /* slightly lighter */
+    --muted: #9aa6b2;
+    /* muted text */
+    --accent: #e2b714;
+    /* cyan-ish accent */
+    --accent-2: #d1a70d;
+    /* purple accent */
+    --glow: 0 10px 30px rgba(125, 211, 252, 0.08);
+    --glass: rgba(255, 255, 255, 0.03);
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, var(--bg) 0%, #071018 100%);
+    color: #e6eef4;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* subtle centered container */
+.menu-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(6px);
+    box-shadow: var(--glow);
+}
+
+/* decorative corner gradient */
+.serika-accent {
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    height: 6px;
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+}
+
+/* small visual detail for focused button */
+.ring-accent:focus {
+    outline: none;
+    box-shadow: 0 6px 30px rgba(167, 139, 250, 0.12), 0 0 0 4px rgba(167, 139, 250, 0.06);
+    border-radius: 9999px;
+}
+
+/* animated glow on primary */
+@keyframes floaty {
+    0% {
+        transform: translateY(0)
+    }
+
+    50% {
+        transform: translateY(-6px)
+    }
+
+    100% {
+        transform: translateY(0)
+    }
+}
+
+.play-cta {
+    animation: floaty 4s ease-in-out infinite;
+}
+
+/* responsive small screen tweaks */
+@media (max-width:420px) {
+    .menu-card {
+        padding: 1.25rem !important
+    }
+}
