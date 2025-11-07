@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="Styles.css">
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-6">
+    <main class="w-full max-w-md">
+        <div class="menu-card rounded-2xl overflow-hidden p-8">
+            <div class="serika-accent"></div>
+
+            <header class="flex items-center gap-4 mt-6 mb-6">
+                <div
+                    class="flex-none w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-darkyellow-400 flex items-center justify-center text-black font-extrabold">
+                    TR</div>
+                <div>
+                    <h1 class="text-2xl font-extrabold leading-tight">TypeWriter</h1>
+                    <p class="text-sm text-[color:var(--muted)]">Clean, minimal typing roguelike — Inspired by
+                        Monkeytype</p>
+                </div>
+            </header>
+
+            <section class="space-y-4" role="menu" aria-label="Main menu">
+                <a href="Round/Round.html" id="playBtn"
+                    class="play-cta w-full text-left p-4 rounded-xl menu-btn flex items-center justify-between bg-[color:var(--card)] hover:scale-[1.01] transition-transform duration-200 border border-transparent hover:border-white/6 ring-accent focus:ring-2 focus:ring-offset-0">
+                    <div>
+                        <div class="text-lg font-semibold">Play</div>
+                        <div class="text-xs text-[color:var(--muted)]">Jump into the game</div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[color:var(--accent)]" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M14.752 11.168l-6.518-3.76A1 1 0 006 8.239v7.522a1 1 0 001.234.97l6.518-1.5a1 1 0 00.748-.97v-3.293a1 1 0 00-.748-.7z" />
+                    </svg>
+                </a>
+
+                <a href="Gameplay/Contributors.html" id="contributorsBtn"
+                    class="w-full text-left p-4 rounded-xl menu-btn flex items-center justify-between bg-[color:var(--card)] hover:scale-[1.01] transition-transform duration-200 border border-transparent hover:border-white/6 ring-accent focus:ring-2 focus:ring-offset-0">
+                    <div>
+                        <div class="text-lg font-semibold">Contributors</div>
+                        <div class="text-xs text-[color:var(--muted)]">See who helped build this</div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-[color:var(--accent-2)]"
+                        viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path fill-rule="evenodd" d="M2 14s1-4 8-4 8 4 8 4v2H2v-2z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+
+                <button id="quitBtn"
+                    class="w-full text-left p-4 rounded-xl menu-btn flex items-center justify-between bg-[color:var(--card)] hover:scale-[1.01] transition-transform duration-200 border border-transparent hover:border-white/6 ring-accent focus:ring-2 focus:ring-offset-0">
+                    <div>
+                        <div class="text-lg font-semibold">Quit</div>
+                        <div class="text-xs text-[color:var(--muted)]">Close the application</div>
+                    </div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-400" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </section>
+
+        </div>
+    </main>
+    <script src="Script.js"></script>
+</body>
+
+</html>
