@@ -50,4 +50,11 @@ Each buff gives you a strategic advantage during a typing round, trade offs for 
 
 
 ---
+## 💬 Support
 
+If you enjoy TypeWriter, please consider starring the repository ⭐ to show your support!
+
+Found a bug or have an idea for improvement?
+Open an issue, you feedback imporves the game! 
+
+---
