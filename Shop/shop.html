@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Buff Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="stylesheet" href="shop.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="shop-card">
+      <header class="shop-head">
+        <div style="display:flex;flex-direction:column;">
+          <div style="display:flex;gap:0.5rem;align-items:center;">
+            <div style="font-weight:800;font-size:1.1rem">Buff Shop</div>
+            <div style="color:var(--muted);font-size:0.95rem;">Temporary buffs — effects to be added later</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.75rem;align-items:center;">
+          <div class="coins"><i class="fas fa-coins"></i><span id="coins">0</span></div>
+          <button id="refreshBtn" class="refresh-btn" title="Refresh offers (free)">
+            <i class="fas fa-sync-alt"></i>
+            <span class="hidden sm:inline-block"> Refresh</span>
+          </button>
+        </div>
+      </header>
+
+      <div id="currentBuffBox" class="current-buff-box mb-6 hidden">
+        <div class="current-buff-content">
+          <div class="buff-info">
+            <div class="buff-icon" id="currentBuffIcon"><i class="fa-solid fa-gem"></i></div>
+            <div>
+              <div class="buff-name" id="currentBuffName">None</div>
+              <div class="buff-desc" id="currentBuffDesc">No active buff equipped.</div>
+            </div>
+          </div>
+          <button id="sellBuffBtn" class="sell-btn"><i class="fa-solid fa-dollar-sign"></i> Sell</button>
+        </div>
+      </div>
+
+      <div class="grid-cards" id="cardsContainer" aria-live="polite"></div>
+
+      <div class="note">Legendary <span style="color:var(--purple);font-weight:800">purple</span> • Rare <span
+          style="color:var(--red);font-weight:800">red</span> • Uncommon <span
+          style="color:var(--green);font-weight:800">green</span> • Common <span
+          style="color:var(--blue);font-weight:800">blue</span></div>
+    </div>
+
+    <div class="flex justify-center mb-6">
+      <a href="../Round/Round.html" class="px-6 py-3 rounded-lg bg-[#e2b714] text-[#323437] font-semibold 
+            hover:bg-[#f0c347] transition flex items-center gap-2 shadow-md">
+        <i class="fa-solid fa-play"></i>
+        <span>Play Next</span>
+      </a>
+    </div>
+  </div>
+
+  <script src="shop.js"></script>
+</body>
+
+</html>
