@@ -1,4 +1,5 @@
 let gameStarted = false;
+let currentRound = parseInt(localStorage.getItem('currentRound') || '1', 10);
 const GLOBAL_TIMER = 80;
 let timeLeft = GLOBAL_TIMER;
 let timerInterval;
@@ -18,6 +19,31 @@ let buffTimerInterval = null;
 let originalWords = [];
 let lastWordTriggeredIndex = -1;
 let madeInHeavenActive = false;
+let gameEnded = false;
+
+
+// Subtitles for "Une vie à t’aimer"
+const renoirSubtitles = [
+    { time: 3, text: "Couleurs embrasées" },
+    { time: 7, text: "Rouge feu, vie ôtée" },
+    { time: 11, text: "Tableau que je ne peux voir" },
+    { time: 15, text: "Fermer les yeux, reste le noir" },
+    { time: 19, text: "En noir, ses yeux tristes" },
+    { time: 23, text: "À travers l'or, son rire persiste" },
+    { time: 27, text: "Dans chaque couleur, une part de lui" },
+    { time: 31, text: "L'aimer toujours, même s'il n'est plus ici" },
+    { time: 35, text: "Peindre l'amour" },
+    { time: 37, text: "Peindre la vie" },
+    { time: 39, text: "Pleurer en couleurs" },
+    { time: 43, text: "Sur la toile, notre amour demeure" },
+    { time: 47, text: "Je t'aime" },
+    { time: 53, text: "Peindre l'amour" },
+    { time: 55, text: "Peindre la vie" },
+    { time: 57, text: "Pleurer en couleurs" },
+    { time: 61, text: "Sur la toile, notre amour demeure" },
+    { time: 65, text: "Je t'aime" }
+];
+
 
 
 const keyMap = new Map();
@@ -121,10 +147,26 @@ function startTimer() {
         wpmHistory.push(currentWpm);
         timeHistory.push(Math.round(elapsed * 60));
 
-        if ((timeLeft <= 0 && !madeInHeavenActive) || gameMechanics.health <= 0) {
-            clearInterval(timerInterval);
-            evaluatePerformance();
+        const selectedFile = localStorage.getItem('selectedRound');
+
+        // Only show death screen if Technology round
+        if (selectedFile && selectedFile.toLowerCase().includes("technology")) {
+            if (timeLeft <= 0 && !madeInHeavenActive && typedText.length < originalText.length) {
+                showDeathScreen("time");
+            } else if (gameMechanics.health <= 0) {
+                showDeathScreen("health");
+            }
+        } else {
+            // For other rounds, end the game normally but still fail
+            if ((timeLeft <= 0 && !madeInHeavenActive && typedText.length < originalText.length) || gameMechanics.health <= 0) {
+                clearInterval(timerInterval);
+                gameStarted = false;
+                gameEnded = true;
+                alert("❌ You failed this round!");
+                window.location.href = "../RoundSelect/roundSelect.html"; // or wherever your round select page is
+            }
         }
+
 
     }, 1000);
 }
@@ -291,6 +333,9 @@ function createWpmChart(wpmData, timeData) {
 
 /* round evaluation */
 function evaluatePerformance() {
+    if (gameEnded) return; // prevent double triggering
+    gameEnded = true;
+    gameStarted = false;
     clearInterval(timerInterval);
     allowNegativeTimeMode = false;
     madeInHeavenActive = false;
@@ -346,6 +391,74 @@ function evaluatePerformance() {
     document.getElementById("message").classList.remove("hidden");
 }
 
+function showDeathScreen(reason = "unknown") {
+    clearInterval(timerInterval);
+    gameStarted = false;
+    gameEnded = true;
+
+    // Hide main game UI
+    const gameUI = document.getElementById("mid");
+    if (gameUI) gameUI.classList.add("hidden");
+
+    // Prepare death message
+    let title = "You Died!";
+    let subtitle = "";
+
+    if (reason === "health") subtitle = "You ran out of health.";
+    else if (reason === "time") subtitle = "Time’s up!";
+    else subtitle = "You failed the round.";
+
+    // Create or show death screen
+    let deathScreen = document.getElementById("death-screen");
+    if (!deathScreen) {
+        deathScreen = document.createElement("div");
+        deathScreen.id = "death-screen";
+        Object.assign(deathScreen.style, {
+            position: "fixed",
+            top: "0",
+            left: "0",
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.92)",
+            color: "#fff",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "Roboto Mono, monospace",
+            zIndex: "9999",
+            textAlign: "center",
+            transition: "opacity 0.6s ease",
+            opacity: "0"
+        });
+
+        deathScreen.innerHTML = `
+            <h1 style="font-size:3rem; color:#e74c3c; margin-bottom:0.5em;">💀 ${title}</h1>
+            <p style="font-size:1.2rem; margin-bottom:1.5em;">${subtitle}</p>
+            <button id="retry-btn" style="background:#e74c3c; border:none; padding:0.8em 2em; border-radius:8px; color:#fff; font-size:1rem; cursor:pointer; margin-bottom:0.5em;">Return to Main Menu</button>
+        `;
+        document.body.appendChild(deathScreen);
+        requestAnimationFrame(() => (deathScreen.style.opacity = "1"));
+
+        // Add button logic
+        document.getElementById("retry-btn").addEventListener("click", () => {
+            // Reset player progression when returning to main menu
+            localStorage.setItem("currentRound", "1");
+            localStorage.setItem("playerCoins", "0");
+            localStorage.removeItem("equippedBuff");
+            localStorage.removeItem("lastSessionCoins");
+            localStorage.removeItem("lastSessionScore");
+            localStorage.removeItem("songGiHunProgress"); // if exists
+            window.location.href = "../Index.html";
+        });
+
+        document.getElementById("back-shop-btn").addEventListener("click", () => {
+            window.location.href = "../Shop/shop.html";
+        });
+    }
+}
+
+
 
 function closeMessageAndGoToShop() {
     localStorage.setItem('lastSessionScore', String(score));
@@ -353,6 +466,8 @@ function closeMessageAndGoToShop() {
     if (!localStorage.getItem('playerCoins')) {
         localStorage.setItem('playerCoins', '0');
     }
+    currentRound++;
+    localStorage.setItem('currentRound', currentRound.toString());
 
     window.location.href = '../Shop/shop.html';
 }
@@ -361,6 +476,7 @@ function closeMessageAndGoToShop() {
 /* Key handling (user input) */
 document.addEventListener("keydown", e => {
     highlightKey(e.key);
+    if (gameEnded) return;
 
     if (!gameStarted && e.ctrlKey) {
         fetchParagraph();
@@ -459,12 +575,15 @@ document.getElementById('next-button').addEventListener('click', () => {
     closeMessageAndGoToShop();
 });
 
-/* Initialize keyboard mapping on DOM load */
+/* Initialize keyboard */
 document.addEventListener('DOMContentLoaded', () => {
     initKeyboardMapping();
     document.getElementById("timer").textContent = GLOBAL_TIMER;
     document.getElementById("score-display").textContent = "0";
     document.getElementById("health-fill").style.width = "100%";
+
+    const roundDisplay = document.getElementById("round-display");
+    if (roundDisplay) roundDisplay.textContent = currentRound;
 });
 
 
@@ -502,7 +621,6 @@ function clearActiveBuff() {
     document.getElementById('buff-duration').textContent = '';
 }
 
-// buffs
 
 
 // ---------------------------------------------- legendary -----------------------------------------
@@ -585,63 +703,44 @@ function applyBuffEffects(buff) {
             });
             break;
 
-        case "Just Vibe": {
-            clearInterval(timerInterval);
-            allowNegativeTimeMode = true;
-            madeInHeavenActive = false;
+        case "Pierre-Auguste Renoir":
+            applyLegendaryTheme("Pierre-Auguste Renoir");
+
+            gameMechanics.healthMax = Math.floor(gameMechanics.healthMax * 0.3);
             gameMechanics.health = gameMechanics.healthMax;
+            document.getElementById("health-fill").style.width = "30%";
 
-            const timerEl = document.getElementById("timer");
-            timerEl.textContent = "∞";
-            const healthFill = document.getElementById("health-fill");
-            healthFill.style.width = "100%";
+            activeBuff.onCorrectChar = ({ gameMechanics }) => {
+                gameMechanics.health = Math.min(gameMechanics.health + 3, gameMechanics.healthMax);
+                timeLeft += 3;
+                document.getElementById("health-fill").style.width =
+                    `${(gameMechanics.health / gameMechanics.healthMax) * 100}%`;
 
-            // === RAINBOW BACKGROUND (now on top of Tailwind body) ===
-            const rainbowLayer = document.createElement("div");
-            rainbowLayer.id = "vibe-rainbow";
-            document.body.appendChild(rainbowLayer);
-
-            // === Create visual cat layer ===
-            const vibeLayer = document.createElement("div");
-            vibeLayer.id = "vibe-layer";
-            vibeLayer.innerHTML = `
-        <div class="vibe-side vibe-left">
-            <img src="assets/gifs/CatVibe.gif" alt="Vibe Left" />
-        </div>
-        <div class="vibe-side vibe-right">
-            <img src="assets/gifs/CatVibe.gif" alt="Vibe Right" />
-        </div>`;
-            document.body.appendChild(vibeLayer);
-
-            // === Audio setup ===
-            const vibeAudio = new Audio("assets/audio/Levan Polka.mp3");
-            vibeAudio.loop = true;
-            vibeAudio.volume = 0.4;
-            const startMusic = () => {
-                vibeAudio.play().catch(() => { });
-                document.removeEventListener("keydown", startMusic);
-            };
-            document.addEventListener("keydown", startMusic);
-
-            // Keep health full forever
-            const vibeHealth = setInterval(() => {
-                gameMechanics.health = gameMechanics.healthMax;
-                healthFill.style.width = "100%";
-            }, 500);
-
-            // End only when paragraph done
-            const vibeCheck = setInterval(() => {
-                if (typedText.length >= originalText.length) {
-                    clearInterval(vibeHealth);
-                    clearInterval(vibeCheck);
-                    vibeAudio.pause();
-                    if (vibeLayer) vibeLayer.remove();
-                    if (rainbowLayer) rainbowLayer.remove();
-                    evaluatePerformance();
+                const overlay = document.getElementById("renoir-pulse");
+                if (overlay) {
+                    overlay.style.opacity = 0.6;
+                    setTimeout(() => (overlay.style.opacity = 0), 300);
                 }
-            }, 300);
+            };
+
+            const overlay = document.createElement("div");
+            overlay.id = "renoir-pulse";
+            overlay.style.position = "fixed";
+            overlay.style.top = 0;
+            overlay.style.left = 0;
+            overlay.style.width = "100vw";
+            overlay.style.height = "100vh";
+            overlay.style.pointerEvents = "none";
+            overlay.style.background = "radial-gradient(circle, rgba(244,182,125,0.1), transparent 60%)";
+            overlay.style.transition = "opacity 0.3s ease";
+            overlay.style.opacity = 0;
+            overlay.style.zIndex = 1;
+            document.body.appendChild(overlay);
+
+            console.log("🎨 Legendary: Pierre-Auguste Renoir activated");
             break;
-        }
+
+
 
 
 
@@ -786,7 +885,6 @@ function applyBuffEffects(buff) {
         }
             break;
 
-        // -------------------------------------- Common -----------------------------------------------------
 
         case "Eve":
             gameMechanics.timerBase += 5;
@@ -1065,11 +1163,6 @@ function applyBuffEffects(buff) {
     }
 }
 
-
-
-// Themes for legandary buffs
-
-
 const legendaryThemes = {
     "Made in Heaven": {
         background: "radial-gradient(circle, #000 0%, #111 100%)",
@@ -1083,6 +1176,16 @@ const legendaryThemes = {
         animation: "frogParticles",
         accent: "#79d7fd"
     },
+    "Pierre-Auguste Renoir": {
+        background: "linear-gradient(180deg, #1f1a17 0%, #6c8a9e 100%)",
+        filter: "sepia(0.3) brightness(1.1)",
+        music: "assets/audio/Renoir.mp3",
+        animation: "paintParticles",
+        accent: "#f4b67d",
+        font: "'Cormorant Garamond', serif"
+    },
+
+
 
 };
 
@@ -1096,9 +1199,64 @@ function applyLegendaryTheme(buffName) {
 
     currentTheme = buffName;
 
+    startLegendaryAnimation(theme.animation);
+
     document.body.style.background = theme.background;
     document.body.style.filter = theme.filter;
     document.body.style.transition = "all 0.8s ease";
+
+    let renoirSubtitleInterval = null;
+
+    function showRenoirSubtitles(audioElement) {
+        if (document.getElementById("renoir-subtitles")) return;
+
+        const subEl = document.createElement("div");
+        subEl.id = "renoir-subtitles";
+        Object.assign(subEl.style, {
+            position: "fixed",
+            bottom: "8%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "1.4rem",
+            color: "#f2e3c6",
+            textShadow: "0 0 8px rgba(0,0,0,0.7)",
+            opacity: "0",
+            transition: "opacity 0.6s ease",
+            zIndex: "100"
+        });
+        document.body.appendChild(subEl);
+
+        let currentIndex = 0;
+
+        renoirSubtitleInterval = setInterval(() => {
+            if (!audioElement || audioElement.paused) return;
+            const t = audioElement.currentTime;
+
+            if (currentIndex < renoirSubtitles.length && t >= renoirSubtitles[currentIndex].time) {
+                const line = renoirSubtitles[currentIndex];
+                const nextLine = renoirSubtitles[currentIndex + 1];
+                const timeToNext = nextLine ? nextLine.time - line.time : 3; // default 3s if last line
+
+                // Show line with immediate fade-in
+                subEl.textContent = line.text;
+                subEl.style.opacity = "1";
+
+                // fade-out before next line starts (0.3s early for clean transition)
+                const fadeOutDelay = Math.max((timeToNext - 0.3) * 1000, 800); // at least 0.8s visible
+                setTimeout(() => {
+                    subEl.style.opacity = "0";
+                }, fadeOutDelay);
+
+                currentIndex++;
+            }
+
+            if (currentIndex >= renoirSubtitles.length) {
+                clearInterval(renoirSubtitleInterval);
+            }
+        }, 150);
+    }
+
 
     if (buffName === "Makoto") {
         document.documentElement.style.setProperty("--accent-color", "#00bbfa"); document.documentElement.style.setProperty("--text-color", "#79d7fd"); document.documentElement.style.setProperty("--bg-color", "#001736"); document.documentElement.style.setProperty("--secondary-bg", "#00183e");
@@ -1113,17 +1271,92 @@ function applyLegendaryTheme(buffName) {
         document.documentElement.style.setProperty("--bg-color", "#000");
     }
 
-    startLegendaryAnimation(theme.animation);
+    if (buffName === "Pierre-Auguste Renoir") {
+        document.documentElement.style.setProperty("--bg-color", "#1f1a17");
+        document.documentElement.style.setProperty("--text-color", "#f2e3c6");
+        document.documentElement.style.setProperty("--accent-color", "#f4b67d");
+        document.documentElement.style.setProperty("--error-color", "#8c4a3c");
+        document.documentElement.style.setProperty("--text-correct", "#f4b67d");
+        document.documentElement.style.setProperty("--text-error", "#8c4a3c");
+        document.documentElement.style.setProperty("--text-muted", "#a79a86");
+        document.documentElement.style.setProperty("--health-grad-start", "#f4b67d");
+        document.documentElement.style.setProperty("--health-grad-end", "#b06b3b");
+        document.documentElement.style.setProperty("--health-bg", "#2a2220");
+        document.documentElement.style.setProperty("--health-border", "#4e3d38");
+        document.body.style.fontFamily = "'Cormorant Garamond', serif";
+
+        const vignette = document.createElement("div");
+        vignette.id = "renoir-vignette";
+        Object.assign(vignette.style, {
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            background: "radial-gradient(circle, transparent 60%, rgba(0,0,0,0.35) 100%)",
+            pointerEvents: "none", zIndex: 2, opacity: "0",
+            transition: "opacity 1.5s ease"
+        });
+        document.body.appendChild(vignette);
+        requestAnimationFrame(() => (vignette.style.opacity = "1"));
+
+        createDustParticles(themeAnimationEl);
+
+        const rays = document.createElement("div");
+        rays.id = "renoir-rays";
+        Object.assign(rays.style, {
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            background: "linear-gradient(115deg, rgba(255,230,180,0.05) 0%, rgba(255,255,255,0.0) 70%)",
+            mixBlendMode: "screen", pointerEvents: "none",
+            animation: "rayMove 10s ease-in-out infinite alternate",
+            zIndex: 3
+        });
+        document.body.appendChild(rays);
+
+        const styleRays = document.createElement("style");
+        styleRays.textContent = `
+          @keyframes rayMove {
+            from { transform: translateX(-3%) rotate(1deg); }
+            to   { transform: translateX(3%) rotate(-1deg); }
+          }`;
+        document.head.appendChild(styleRays);
+
+        const bloom = document.createElement("div");
+        bloom.id = "renoir-bloom";
+        Object.assign(bloom.style, {
+            position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
+            pointerEvents: "none", backdropFilter: "blur(4px) brightness(1.1) saturate(1.2)",
+            opacity: 0, transition: "opacity 3s ease", zIndex: 4
+        });
+        document.body.appendChild(bloom);
+        setTimeout(() => (bloom.style.opacity = 0.35), 1200);
+
+
+        document.body.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1500, easing: "ease-out" });
+    }
 
     if (theme.music) {
-        themeAudio = new Audio(theme.music);
-        themeAudio.volume = 0.5;
-        themeAudio.loop = true;
-        themeAudio.play().catch(e => console.warn("Music autoplay blocked"));
+        const playMusic = () => {
+            if (themeAudio) return;
+            themeAudio = new Audio(theme.music);
+            themeAudio.volume = 0.5;
+            themeAudio.loop = false;
+
+            themeAudio.play().then(() => {
+                if (buffName === "Pierre-Auguste Renoir") {
+                    showRenoirSubtitles(themeAudio);
+                }
+            }).catch(e => console.warn("🎵 Autoplay blocked; waiting for user input"));
+
+            document.removeEventListener("click", playMusic);
+            document.removeEventListener("keydown", playMusic);
+        };
+
+        document.addEventListener("click", playMusic);
+        document.addEventListener("keydown", playMusic);
     }
+
 
     console.log(`✨ Legendary theme applied: ${buffName}`);
 }
+
+
 
 function revertLegendaryTheme() {
     if (themeAudio) {
@@ -1162,6 +1395,9 @@ function startLegendaryAnimation(type) {
         createWordStorm(themeAnimationEl);
     } else if (type === "frogParticles") {
         createFrogParticles(themeAnimationEl);
+    }
+    else if (type === "paintParticles") {
+        createPaintParticles(themeAnimationEl);
     }
 }
 
@@ -1227,6 +1463,66 @@ function createFrogParticles(container) {
         });
     }, 600);
 }
+
+function createPaintParticles(container) {
+    const colors = ["#f4b67d", "#f2e3c6", "#b06b3b", "#6c8a9e"];
+    for (let i = 0; i < 90; i++) {
+        const stroke = document.createElement("div");
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        stroke.style.position = "absolute";
+        stroke.style.left = `${Math.random() * 100}vw`;
+        stroke.style.top = `${Math.random() * 100}vh`;
+        stroke.style.width = `${2 + Math.random() * 10}px`;
+        stroke.style.height = `${8 + Math.random() * 30}px`;
+        stroke.style.background = color;
+        stroke.style.opacity = 0.15 + Math.random() * 0.25;
+        stroke.style.transform = `rotate(${Math.random() * 360}deg)`;
+        stroke.style.animation = `paintFloat ${5 + Math.random() * 5}s ease-in-out infinite alternate`;
+        stroke.style.borderRadius = "2px";
+        container.appendChild(stroke);
+    }
+
+    const style = document.createElement("style");
+    style.textContent = `
+        @keyframes paintFloat {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-10vh) rotate(10deg); opacity: 0.5; }
+            100% { transform: translateY(-20vh) rotate(20deg); opacity: 0.3; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+function createDustParticles(container) {
+    for (let i = 0; i < 40; i++) {
+        const d = document.createElement("div");
+        d.className = "dust";
+        d.style.left = `${Math.random() * 100}vw`;
+        d.style.top = `${Math.random() * 100}vh`;
+        d.style.animationDelay = `${Math.random() * 8}s`;
+        container.appendChild(d);
+    }
+}
+
+const styleDust = document.createElement("style");
+styleDust.textContent = `
+  .dust {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: rgba(255, 238, 200, 0.4);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: dustFloat 8s ease-in-out infinite;
+  }
+  @keyframes dustFloat {
+    0%   { transform: translateY(0) scale(1); opacity: 0.2; }
+    50%  { transform: translateY(-15vh) scale(1.2); opacity: 0.4; }
+    100% { transform: translateY(0) scale(1); opacity: 0.2; }
+  }
+`;
+document.head.appendChild(styleDust);
+
 
 
 
