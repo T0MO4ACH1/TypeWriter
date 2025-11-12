@@ -1213,7 +1213,7 @@ function applyLegendaryTheme(buffName) {
         subEl.id = "renoir-subtitles";
         Object.assign(subEl.style, {
             position: "fixed",
-            bottom: "8%",
+            bottom: "3%",
             left: "50%",
             transform: "translateX(-50%)",
             fontFamily: "'Cormorant Garamond', serif",
